@@ -1,0 +1,36 @@
+
+<head>
+    <title>Augmented oscillation</title>
+    <script type="text/javascript" src="/src/tracking.js"></script>
+    <script type="text/javascript" src="/src/tracker/color.js"></script>
+</head>
+<body>
+    <script>
+        var videoCamera = new tracking.VideoCamera().renderVideoCanvas(),
+            context = new webkitAudioContext(),
+            oscillation = context.createOscillator(),
+            flag = false;
+
+        oscillation.connect( context.destination );
+
+        videoCamera.track({
+            type: 'color',
+            color: 'magenta',
+            onFound: function ( track ) {
+                if ( !flag ) {
+                    oscillation.noteOn(0);
+                    flag = true;
+                }
+
+                oscillation.frequency.value = track.z * 10;
+            },
+            onNotFound: function () {
+                if ( oscillation !== null && flag ) {
+                    oscillation.noteOff(0);
+                    flag = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
